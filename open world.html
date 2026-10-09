@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>除了快乐禁止入内｜黄子弘凡</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffe666, #c94488, #7b2cbf);
+        min-height: 100vh;
+        font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* ========== 加载屏：亮灯仪式 ========== */
+    #loading-screen {
+        position: fixed;
+        inset: 0;
+        background: #1a0b2e;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 60px;
+        transition: opacity 0.8s ease;
+    }
+
+    .loading-smiles {
+        display: flex;
+        gap: 40px;
+    }
+
+    .smile-dot {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #332244;
+        position: relative;
+        opacity: 0.3;
+        transition: all 0.6s ease;
+    }
+
+    .smile-dot::before,
+    .smile-dot::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #1a0b2e;
+        top: 18px;
+    }
+
+    .smile-dot::before { left: 16px; }
+    .smile-dot::after { right: 16px; }
+
+    .smile-dot.lit {
+        background: #ffdd44;
+        opacity: 1;
+        box-shadow: 0 0 30px rgba(255, 221, 68, 0.7);
+    }
+
+    .loading-text {
+        color: #ffe666;
+        font-size: 18px;
+        letter-spacing: 4px;
+        opacity: 0.8;
+    }
+
+    /* ========== 序章 Manifesto ========== */
+    #manifesto-screen {
+        position: fixed;
+        inset: 0;
+        background: #120820;
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 36px;
+        padding: 0 40px;
+        text-align: center;
+        opacity: 0; /* 初始透明，和加载屏重叠过渡 */
+        pointer-events: none; /* 初始不可点击 */
+        transition: opacity 0.8s ease;
+    }
+
+    #manifesto-screen.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .manifesto-line {
+        font-size: 56px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: 6px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .manifesto-line.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .manifesto-line.highlight {
+        color: #ffe666;
+    }
+
+    .enter-btn {
+        margin-top: 40px;
+        padding: 16px 60px;
+        font-size: 22px;
+        font-weight: bold;
+        color: #7b2cbf;
+        background: #ffe666;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+        letter-spacing: 4px;
+    }
+
+    .enter-btn.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .enter-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(255, 230, 102, 0.4);
+    }
+
+    /* ========== 彩纸屑动画 ========== */
+    .confetti-container {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        animation: fall linear infinite;
+    }
+    @keyframes fall {
+        0% {transform: translateY(-20px) rotate(0deg);opacity: 1;}
+        100% {transform: translateY(100vh) rotate(720deg);opacity: 0;}
+    }
+
+    /* ========== 闪烁星星背景 ========== */
+    .stars-container {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .star {
+        position: absolute;
+        background-color: #ffffff;
+        border-radius: 50%;
+        animation: twinkle 3s ease-in-out infinite;
+    }
+    @keyframes twinkle {
+        0%,100% { opacity:0.3; }
+        50% { opacity:0.9; }
+    }
+
+    /* ========== 顶部导航栏 ========== */
+    nav {
+        position: sticky;
+        top: 12px;
+        z-index: 99;
+        width: 100%;
+        padding:0 20px;
+    }
+    .nav-inner {
+        width:1400px;
+        max-width:100%;
+        margin:0 auto;
+        display:flex;
+        justify-content:center;
+        gap:50px;
+        background:rgba(255,255,255,0.92);
+        border-radius:50px;
+        box-shadow:0 6px 24px rgba(0,0,0,0.18);
+        padding:14px 20px;
+    }
+    .nav-inner a {
+        color:#7b2cbf;
+        text-decoration:none;
+        font-size:18px;
+        font-weight:bold;
+        letter-spacing:2px;
+        padding:6px 14px;
+        border-radius:22px;
+        transition:0.3s;
+    }
+    .nav-inner a:hover{
+        background:#7b2cbf;
+        color:#ffe666;
+        transform:translateY(-2px);
+    }
+
+    .container {
+        width:1400px;
+        max-width:100%;
+        margin:0 auto;
+        padding:30px 24px 60px;
+        position:relative;
+        z-index:2;
+        visibility: hidden; /* 初始隐藏，彻底防止泄露 */
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .container.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .scroll-item {
+        opacity:0;
+        transform:translateY(40px);
+        transition:0.8s ease;
+    }
+    .scroll-item.active{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+    /* ========== Hero首页主视觉 ========== */
+    .hero {
+        position:relative;
+        width:100%;
+        min-height:85vh;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        margin-bottom:60px;
+        overflow:hidden;
+    }
+
+    .hero-center{
+        text-align:center;
+        position:relative;
+        z-index:4;
+    }
+    .hero-title{
+        width:72%;
+        max-width:740px;
+        margin:0 auto 26px;
+        transition:0.4s;
+    }
+    .hero-title:hover{ transform:scale(1.04); }
+    .hero-tape{
+        width:52%;
+        max-width:520px;
+        transition:0.4s;
+    }
+    .hero-tape:hover{ transform:scale(1.05); }
+
+    /* 两侧角色图片 —— chibi和burger共用同一个漂浮动画 */
+    .hero-side{
+        position:absolute;
+        width:17%;
+        max-width:240px;
+        z-index:3;
+        transition:0.4s;
+        animation:floatY 3s ease-in-out infinite;
+    }
+    .hero-chibi{
+        left:4%;
+        bottom:14%;
+    }
+    .hero-burger{
+        right:4%;
+        bottom:14%;
+    }
+
+    /* 角落装饰图片 */
+    .hero-deco{
+        position:absolute;
+        width:9%;
+        max-width:130px;
+        z-index:2;
+    }
+    .hero-dog{
+        top:12%;
+        right:10%;
+        animation:dogRun 7s ease-in-out infinite;
+    }
+    .hero-mailbox{
+        top:16%;
+        left:10%;
+    }
+
+    @keyframes floatY{
+        0%,100%{transform:translateY(0);}
+        50%{transform:translateY(-12px);}
+    }
+    @keyframes dogRun{
+        0%,100%{transform:translateX(0);}
+        50%{transform:translateX(-18px);}
+    }
+
+    /* =========首页快捷标签按钮组========= */
+    .quick-tag-group{
+        display:flex;
+        gap:16px;
+        flex-wrap:wrap;
+        justify-content:center;
+        margin:40px 0 32px;
+        z-index:5;
+        position:relative;
+    }
+    .quick-tag{
+        padding:12px 24px;
+        background:rgba(255,255,255,0.9);
+        color:#c94488;
+        border-radius:40px;
+        font-weight:bold;
+        font-size:16px;
+        text-decoration:none;
+        box-shadow:0 4px 14px rgba(0,0,0,0.12);
+        transition:0.3s;
+    }
+    .quick-tag:hover{
+        background:#c94488;
+        color:#fff;
+        transform:translateY(-3px);
+    }
+
+    /* =========首页多卡片区域========= */
+    .hero-card-wrap{
+        display:grid;
+        grid-template-columns: repeat(3,1fr);
+        gap:24px;
+        width:100%;
+        margin-top:20px;
+    }
+    .hero-card{
+        background:rgba(255,255,255,0.93);
+        border-radius:22px;
+        padding:28px 22px;
+        box-shadow:0 8px 26px rgba(120,20,80,0.18);
+        text-align:center;
+        transition:0.35s;
+    }
+    .hero-card:hover{
+        transform:translateY(-6px);
+        box-shadow:0 12px 32px rgba(120,20,80,0.24);
+    }
+    .hero-card h4{
+        color:#7b2cbf;
+        font-size:20px;
+        margin-bottom:12px;
+    }
+    .hero-card p{
+        color:#444;
+        font-size:15px;
+        line-height:1.7;
+    }
+
+    /* 全局内容卡片 */
+    .card {
+        background:rgba(255,255,255,0.94);
+        border-radius:24px;
+        padding:40px;
+        box-shadow:0 10px 30px rgba(120,20,80,0.2);
+        margin-bottom:60px;
+    }
+    .card h2{
+        color:#7b2cbf;
+        font-size:28px;
+        text-align:center;
+        margin-bottom:24px;
+        letter-spacing:3px;
+        position:relative;
+    }
+    .card h2::after{
+        content:"";
+        display:block;
+        width:60px;
+        height:4px;
+        background:linear-gradient(90deg,#ffe666,#c94488);
+        border-radius:2px;
+        margin:12px auto 0;
+    }
+    .intro-card p{
+        font-size:17px;
+        line-height:1.9;
+        color:#333;
+        text-align:center;
+        max-width:900px;
+        margin:0 auto;
+    }
+
+    /* 曲目双栏 */
+    .song-two-column{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:30px;
+        margin-top:20px;
+    }
+    .song-day h3{
+        text-align:center;
+        color:#c94488;
+        font-size:22px;
+        margin-bottom:16px;
+    }
+    .song-item {
+        background:linear-gradient(135deg,#ffe666,#ffd23d);
+        color:#7b2cbf;
+        font-weight:700;
+        padding:12px 16px;
+        border-radius:14px;
+        text-align:center;
+        letter-spacing:1px;
+        box-shadow:0 4px 12px rgba(255,214,77,0.4);
+        transition:all 0.3s ease;
+        margin-bottom:10px;
+    }
+    .song-item:hover {
+        background:linear-gradient(135deg,#7b2cbf,#9d4edd);
+        color:#ffe666;
+        transform:translateY(-4px);
+        box-shadow:0 8px 18px rgba(123,44,191,0.35);
+    }
+    .vcr-text{
+        background:#c94488;
+        color:white;
+    }
+    .special-song{
+        background:#7b2cbf;
+        color:#ffe666;
+    }
+
+    /* ========== 票根页脚 ========== */
+    .ticket-footer {
+        width: 100%;
+        background: #f5ecd7;
+        position: relative;
+        margin-top: 40px;
+        padding: 30px 40px 26px;
+    }
+
+    /* 顶部撕边效果 */
+    .ticket-footer::before {
+        content: "";
+        position: absolute;
+        top: -12px;
+        left: 0;
+        width: 100%;
+        height: 12px;
+        background:
+            radial-gradient(circle at 10px 12px, #f5ecd7 8px, transparent 9px);
+        background-size: 20px 12px;
+        background-repeat: repeat-x;
+    }
+
+    .ticket-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .ticket-left {
+        color: #7b2cbf;
+        font-weight: bold;
+        line-height: 1.6;
+    }
+
+    .ticket-left .date {
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+
+    .ticket-left .place {
+        font-size: 15px;
+        opacity: 0.8;
+    }
+
+    /* 装饰条形码 */
+    .barcode {
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 50px;
+    }
+
+    .bar {
+        width: 3px;
+        background: #7b2cbf;
+        border-radius: 2px;
+    }
+
+    .bar:nth-child(odd) { height: 100%; }
+    .bar:nth-child(even) { height: 60%; }
+    .bar:nth-child(3n) { height: 80%; }
+    .bar:nth-child(5n) { height: 40%; }
+
+    .ticket-right {
+        text-align: right;
+        color: #7b2cbf;
+        line-height: 1.6;
+    }
+
+    .ticket-right .logo {
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: 2px;
+    }
+
+    .ticket-right .sub {
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+    /* 响应式适配 */
+    @media (max-width:1100px){
+        .hero-card-wrap{
+            grid-template-columns:1fr 1fr;
+        }
+        .hero-side{
+            width:22%;
+        }
+        .hero-deco{
+            width:12%;
+        }
+        .manifesto-line { font-size: 42px; }
+    }
+    @media (max-width:820px){
+        .song-two-column{
+            grid-template-columns:1fr;
+        }
+        .hero-card-wrap{
+            grid-template-columns:1fr;
+        }
+        .quick-tag-group{
+            gap:10px;
+        }
+        .quick-tag{
+            font-size:14px;
+            padding:10px 16px;
+        }
+        .nav-inner{
+            gap:20px;
+        }
+        .manifesto-line { font-size: 32px; letter-spacing: 3px; }
+        .enter-btn { font-size: 18px; padding: 14px 40px; }
+        .ticket-inner { flex-direction: column; text-align: center; }
+        .ticket-right { text-align: center; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ========== 加载屏：亮灯仪式 ========== -->
+<div id="loading-screen">
+    <div class="loading-smiles">
+        <div class="smile-dot"></div>
+        <div class="smile-dot"></div>
+        <div class="smile-dot"></div>
+        <div class="smile-dot"></div>
+        <div class="smile-dot"></div>
+    </div>
+    <div class="loading-text">快乐局正在启动…</div>
+</div>
+
+<!-- ========== 序章 Manifesto ========== -->
+<div id="manifesto-screen">
+    <div class="manifesto-line" id="line1">我是局长Lars</div>
+    <div class="manifesto-line highlight" id="line2">准备好进入快乐局了吗</div>
+    <div class="manifesto-line" id="line3">记得把快乐置顶首位</div>
+    <button class="enter-btn" id="enterBtn">进入快乐局</button>
+</div>
+
+<!-- ========== 背景装饰 ========== -->
+<div class="stars-container" id="starsBox"></div>
+<div class="confetti-container" id="confettiBox"></div>
+
+<!-- ========== 顶部导航栏 ========== -->
+<nav>
+    <div class="nav-inner">
+        <a href="#home">首页</a>
+        <a href="#intro">快乐局简介</a>
+        <a href="#songlist">曲目列表</a>
+    </div>
+</nav>
+
+<!-- ========== 主内容 ========== -->
+<div class="container" id="mainContainer">
+    <section id="home" class="hero scroll-item">
+        <div class="hero-center">
+            <img class="hero-title" src="title.png" alt="除了快乐禁止入内">
+            <img class="hero-tape" src="tape.png" alt="磁带">
+        </div>
+        <img class="hero-side hero-chibi" src="chibi.png" alt="Q版黄子弘凡">
+        <img class="hero-side hero-burger" src="burger.png" alt="汉堡沙发">
+        <img class="hero-deco hero-dog" src="dog.png" alt="小狗">
+        <img class="hero-deco hero-mailbox" src="mailbox.png" alt="邮箱立牌">
+
+        <div class="quick-tag-group">
+            <a class="quick-tag" href="#home">🏠回到首页</a>
+            <a class="quick-tag" href="#intro">📖快乐局介绍</a>
+            <a class="quick-tag" href="#songlist">🎵查看歌单</a>
+        </div>
+
+        <div class="hero-card-wrap">
+            <div class="hero-card">
+                <h4>演出时间</h4>
+                <p>2026.03.14｜第一场<br>2026.03.15｜第二场</p>
+            </div>
+            <div class="hero-card">
+                <h4>演出地点</h4>
+                <p>北京 · 国家体育场<br>鸟巢</p>
+            </div>
+            <div class="hero-card">
+                <h4>快乐口号</h4>
+                <p>烦恼禁止入场<br>只允许快乐到来✨</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="intro" class="scroll-item card intro-card">
+        <h2>快乐局简介</h2>
+        <p>局长——Lars Huang「除了快乐禁止入内」终章，落地北京鸟巢。这是一场专属于快乐星球的盛大聚会，在这里烦恼禁止入场，只保留歌声、欢笑与热烈。
+        <br><br>
+        在快乐局里你只需要携带快乐，不快乐也没关系，你只管到来，剩下的交给局长！</p>
+    </section>
+
+    <section id="songlist" class="scroll-item card">
+        <h2>曲目列表</h2>
+        <div class="song-two-column">
+            <!--3月14日-->
+            <div class="song-day">
+                <h3>2026.03.14 鸟巢第一场</h3>
+                <div class="song-item vcr-text">VCR1 开场</div>
+                <div class="song-item">除了快乐禁止入内</div>
+                <div class="song-item">Miracle</div>
+                <div class="song-item">逐梦</div>
+                <div class="song-item">那些喊给天空的</div>
+                <div class="song-item">烂歌</div>
+                <div class="song-item">末日狂奔</div>
+                <div class="song-item vcr-text">VCR2 人生像是一团谜团 你们就是谜底</div>
+                <div class="song-item">柯南</div>
+                <div class="song-item">替天行盗</div>
+                <div class="song-item">Waking Now</div>
+                <div class="song-item">卧虎藏龙</div>
+                <div class="song-item">红移</div>
+                <div class="song-item">奇观</div>
+                <div class="song-item vcr-text">VCR3 当思念有了翅膀 相遇是另一种抵达</div>
+                <div class="song-item special-song">小狗飞机</div>
+                <div class="song-item">捕梦</div>
+                <div class="song-item">飞</div>
+                <div class="song-item">Sillage</div>
+                <div class="song-item">上升的一切</div>
+                <div class="song-item">Dance Break 舞团表演</div>
+                <div class="song-item">歌行四方</div>
+                <div class="song-item">国风组曲：骊龙吟/刃火无涯/问鼎/狂澜/潭中月/来者何人/不绝/笑饮孤鸿</div>
+                <div class="song-item">我是如此相信</div>
+                <div class="song-item vcr-text">VCR4 永远都要把快乐置顶首位</div>
+                <div class="song-item special-song">汉堡车</div>
+                <div class="song-item">日出舞台</div>
+                <div class="song-item">无想</div>
+                <div class="song-item">有光</div>
+                <div class="song-item">DO U</div>
+                <div class="song-item">歌谣</div>
+                <div class="song-item">是我，也是我们</div>
+                <div class="song-item">青火</div>
+                <div class="song-item">扭蛋机：赫兹1520/好运来/Can you feel the love tonight/Monsters</div>
+                <div class="song-item">要有有你在的地方</div>
+                <div class="song-item">礼物</div>
+                <div class="song-item vcr-text">VCR5 我们一起去往下一个山海和远方</div>
+                <div class="song-item">送别</div>
+                <div class="song-item">成为你想成为的大人</div>
+                <div class="song-item">友谊地久天长</div>
+            </div>
+            <!--3月15日-->
+            <div class="song-day">
+                <h3>2026.03.15 鸟巢第二场</h3>
+                <div class="song-item vcr-text">VCR1 开场</div>
+                <div class="song-item">除了快乐禁止入内</div>
+                <div class="song-item">Miracle</div>
+                <div class="song-item">逐梦</div>
+                <div class="song-item">那些喊给天空的</div>
+                <div class="song-item">烂歌</div>
+                <div class="song-item">末日狂奔</div>
+                <div class="song-item vcr-text">VCR2 人生像是一团谜团 你们就是谜底</div>
+                <div class="song-item">柯南</div>
+                <div class="song-item">替天行盗</div>
+                <div class="song-item">Waking Now</div>
+                <div class="song-item">卧虎藏龙</div>
+                <div class="song-item">红移</div>
+                <div class="song-item">奇观</div>
+                <div class="song-item vcr-text">VCR3 当思念有了翅膀 相遇是另一种抵达</div>
+                <div class="song-item special-song">小狗飞机</div>
+                <div class="song-item">捕梦</div>
+                <div class="song-item">飞</div>
+                <div class="song-item">Sillage</div>
+                <div class="song-item">上升的一切</div>
+                <div class="song-item">Dance Break 舞团表演</div>
+                <div class="song-item">歌行四方</div>
+                <div class="song-item">国风组曲：骊龙吟/刃火无涯/问鼎/狂澜/潭中月/来者何人/不绝/笑饮孤鸿</div>
+                <div class="song-item">如果我们不曾相遇</div>
+                <div class="song-item vcr-text">VCR4 永远都要把快乐置顶首位</div>
+                <div class="song-item special-song">汉堡车</div>
+                <div class="song-item">日出舞台</div>
+                <div class="song-item">无想</div>
+                <div class="song-item">有光</div>
+                <div class="song-item">DO U</div>
+                <div class="song-item">歌谣</div>
+                <div class="song-item">青火</div>
+                <div class="song-item">万象回响</div>
+                <div class="song-item">扭蛋机：行走的鱼/人鱼的眼泪/一点/爱与诚</div>
+                <div class="song-item">要有有你在的地方</div>
+                <div class="song-item">礼物</div>
+                <div class="song-item vcr-text">VCR5 我们一起去往下一个山海和远方</div>
+                <div class="song-item">送别</div>
+                <div class="song-item">成为你想成为的大人</div>
+                <div class="song-item">The Greatest Show</div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ========== 票根页脚 ========== -->
+<footer class="ticket-footer">
+    <div class="ticket-inner">
+        <div class="ticket-left">
+            <div class="date">2026.03.14 - 03.15</div>
+            <div class="place">北京 · 国家体育场（鸟巢）</div>
+        </div>
+        <div class="barcode">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div>
+        </div>
+        <div class="ticket-right">
+            <div class="logo">LARS HUANG · 快乐局</div>
+            <div class="sub">OFFICIAL TICKET STUB</div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ========== 加载与序章控制 ==========
+    const loadingScreen = document.getElementById('loading-screen');
+    const manifestoScreen = document.getElementById('manifesto-screen');
+    const enterBtn = document.getElementById('enterBtn');
+    const mainContainer = document.getElementById('mainContainer');
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    const line3 = document.getElementById('line3');
+
+    const smiles = document.querySelectorAll('.smile-dot');
+    let smileIndex = 0;
+
+    const lightUp = () => {
+        if (smileIndex < smiles.length) {
+            smiles[smileIndex].classList.add('lit');
+            smileIndex++;
+            setTimeout(lightUp, 500);
+        } else {
+            // ✅ 全部笑脸点亮后，无缝切换：加载屏淡出 + 序章同时淡入
+            loadingScreen.style.opacity = '0';
+            manifestoScreen.classList.add('active');
+            
+            // 加载屏完全淡出后再隐藏DOM
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                startManifesto();
+            }, 800);
+        }
+    };
+
+    window.addEventListener('load', () => {
+        lightUp();
+    });
+
+    // 序章打字机效果
+    function startManifesto() {
+        const text1 = '我是局长Lars';
+        const text2 = '准备好进入快乐局了吗';
+        const text3 = '记得把快乐置顶首位';
+
+        typeWriter(line1, text1, 120, () => {
+            setTimeout(() => {
+                typeWriter(line2, text2, 120, () => {
+                    setTimeout(() => {
+                        typeWriter(line3, text3, 120, () => {
+                            setTimeout(() => {
+                                enterBtn.classList.add('show');
+                            }, 600);
+                        });
+                    }, 500);
+                });
+            }, 500);
+        });
+    }
+
+    // 打字机函数
+    function typeWriter(element, text, speed, callback) {
+        element.classList.add('show');
+        let i = 0;
+        element.textContent = '';
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(timer);
+                if (callback) callback();
+            }
+        }, speed);
+    }
+
+    // 进入按钮
+    enterBtn.addEventListener('click', () => {
+        manifestoScreen.style.opacity = '0';
+        // 显示主内容
+        mainContainer.classList.add('show');
+        
+        setTimeout(() => {
+            manifestoScreen.style.display = 'none';
+            // 触发首页滚动动画
+            setTimeout(() => {
+                document.querySelectorAll('.scroll-item').forEach(item => {
+                    item.classList.add('active');
+                });
+            }, 200);
+        }, 600);
+    });
+
+    // ========== 彩纸屑 ==========
+    const confettiBox = document.getElementById('confettiBox');
+    const colors = ['#ffdd44','#c94488','#7b2cbf','#ffffff','#ff88aa'];
+    for(let i=0;i<70;i++){
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random()*100+'%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+        confetti.style.animationDuration = (Math.random()*3+2)+'s';
+        confetti.style.animationDelay = Math.random()*2+'s';
+        confettiBox.appendChild(confetti);
+    }
+
+    // ========== 闪烁星星 ==========
+    const starsBox = document.getElementById('starsBox');
+    for(let i=0;i<100;i++){
+        const star = document.createElement('div');
+        star.classList.add('star');
+        const size = Math.random()*3+1;
+        star.style.width = size+'px';
+        star.style.height = size+'px';
+        star.style.left = Math.random()*100+'%';
+        star.style.top = Math.random()*100+'%';
+        star.style.animationDuration = (Math.random()*5+3)+'s';
+        star.style.animationDelay = Math.random()*2+'s';
+        starsBox.appendChild(star);
+    }
+
+    // ========== 滚动渐入 ==========
+    const scrollItems = document.querySelectorAll('.scroll-item');
+    const observer = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+            if(entry.isIntersecting){
+                entry.target.classList.add('active');
+            }
+        })
+    },{threshold:0.15});
+    scrollItems.forEach(item=>observer.observe(item));
+</script>
+<!-- 背景音乐：黄子弘凡 - 除了快乐禁止入内 -->
+<audio 
+  id="bgMusic" 
+  src="除了快乐禁止入内.mp3" 
+  autoplay 
+  loop 
+  hidden 
+  preload="auto"
+>
+  您的浏览器不支持音频播放功能
+
+
+<script>
+// 兼容处理：解决浏览器默认拦截自动播放的问题
+const bgMusic = document.getElementById('bgMusic');
+
+window.addEventListener('load', () => {
+  // 页面加载后先尝试自动播放
+  bgMusic.play().catch(() => {
+    // 若被浏览器拦截，监听用户第一次点击页面时触发播放
+    document.addEventListener('click', () => {
+      bgMusic.play();
+    }, { once: true });
+  });
+});
+</script>
+
+</body>
+</html>
